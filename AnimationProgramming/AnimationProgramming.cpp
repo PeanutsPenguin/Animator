@@ -34,13 +34,66 @@ class CSimulation : public ISimulation
 		// Z axis
 		DrawLine(0, 0, 0, 0, 0, 100, 0, 0, 1);
 
+		DrawBones();
+
 	}
+public: 
+
+	void DrawBones()
+	{
+		/*for (int i = 0; i < GetSkeletonBoneCount() - 7; i++)
+		{
+			LinkBoneToParent(i);
+		}*/
+
+		LinkBoneToParent(1);
+	}
+
+	void printSkeletonBoneInfo(int index)
+	{
+		float x0, y0, z0, quatx0, quaty0, quatz0, quatw0;
+		GetSkeletonBoneLocalBindTransform(index, x0, y0, z0, quatx0, quaty0, quatz0, quatw0);
+
+	
+		printf("Bone Name : "); printf(GetSkeletonBoneName(index));
+		printf("\n");
+		printf("Position : x : %f, y : %f,  z : %f\n", x0, y0, z0);
+		printf("Quaternion :  x : %f, y : %f,  z : %f,  w : %f", quatx0, quaty0, quatz0, quatw0);
+		printf("\n");
+	}
+
+	void LinkBoneToParent(int index)
+	{
+		float x0, y0, z0,
+			x1, y1, z1,
+			quatx0, quaty0, quatz0, quatw0,
+			quatx1, quaty1, quatz1, quatw1;
+
+		int parentIndex = GetSkeletonBoneParentIndex(index);
+
+		if (parentIndex == -1)
+			return;
+
+		GetSkeletonBoneLocalBindTransform(index, x0, y0, z0, quatx0, quaty0, quatz0, quatw0);
+		GetSkeletonBoneLocalBindTransform(parentIndex, x1, y1, z1, quatx1, quaty1, quatz1, quatw1);
+
+		DrawLine(x0, y0 - 50, z0, x1, y1 - 50, z1, 0, 0, 255);
+	}
+
 };
 
 int main()
 {
 	CSimulation simulation;
 	Run(&simulation, 1400, 800);
+	
+	for(int i = 0; i < GetSkeletonBoneCount(); i++)
+	{
+		simulation.printSkeletonBoneInfo(i);
+		printf("\n");
+	}
+
+
 
 	return 0;
 }
