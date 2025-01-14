@@ -13,17 +13,24 @@ class CSimulation : public ISimulation
 {
 	virtual void Init() override
 	{
-		int spine01 =	GetSkeletonBoneIndex("spine_01");
-		int spineParent = GetSkeletonBoneParentIndex(spine01);
-		const char* spineParentName = GetSkeletonBoneName(spineParent);
+		int BoneCount = GetSkeletonBoneCount() - 7;
+		std::vector<Transform> bones;
+		bones.reserve(BoneCount);
 
-		float posX, posY, posZ, quatW, quatX, quatY, quatZ;
-		size_t keyCount = GetAnimKeyCount("ThirdPersonWalk.anim");
-		GetAnimLocalBoneTransform("ThirdPersonWalk.anim", spineParent, keyCount / 2, posX, posY, posZ, quatW, quatX, quatY, quatZ);
+		for (int i = 0; i < BoneCount; i++)
+		{
+			bones.push_back(Transform());
+			GetSkeletonBoneLocalBindTransform(i, bones[i].mPosition.x, bones[i].mPosition.y, bones[i].mPosition.z,
+				bones[i].mRotation.w, bones[i].mRotation.x, bones[i].mRotation.y, bones[i].mRotation.z);
 
-		printf("Spine parent bone : %s\n", spineParentName);
-		printf("Anim key count : %ld\n", keyCount);
-		printf("Anim key : pos(%.2f,%.2f,%.2f) rotation quat(%.10f,%.10f,%.10f,%.10f)\n", posX, posY, posZ, quatW, quatX, quatY, quatZ);
+			int parent = GetSkeletonBoneParentIndex(i);
+
+			if (parent != -1)
+				bones[i] *= bones[parent];
+
+			this->inverseBindMatrices.push_back(LibMath::Mat4(bones[i]).GetInverse());
+
+		}
 	}
 
 	void step1(void)
@@ -54,11 +61,18 @@ class CSimulation : public ISimulation
 	{
 		int nbrKeyFrames = GetAnimKeyCount("ThirdPersonWalk.anim");
 
-		this->TimeSpent += frameTime;
-
-		if(TimeSpent > 0.5)
+		if (TimeSpent < (1.f / nbrKeyFrames))
+		{
+			this->TimeSpent += frameTime;
+		}
+		else if (this->keyFrameIndex < nbrKeyFrames - 1)
 		{
 			this->keyFrameIndex += 1;
+			this->TimeSpent = 0;
+		}
+		else 
+		{
+			this->keyFrameIndex = 0;
 			this->TimeSpent = 0;
 		}
 
@@ -75,8 +89,6 @@ class CSimulation : public ISimulation
 		bones.reserve(BoneCount);
 
 		Transform animBone;
-
-		//printf("%d", this->keyFrameIndex);
 
 		for (int i = 0; i < BoneCount; i++)
 		{
@@ -96,6 +108,65 @@ class CSimulation : public ISimulation
 			}
 		}
 	}
+	
+	void step3(float frameTime)
+	{
+		int nbrKeyFrames = GetAnimKeyCount("ThirdPersonWalk.anim");
+
+		if (TimeSpent < (1.f / nbrKeyFrames))
+		{
+			this->TimeSpent += frameTime;
+		}
+		else if (this->keyFrameIndex < nbrKeyFrames - 1)
+		{
+			this->keyFrameIndex += 1;
+			this->TimeSpent = 0;
+		}
+		else
+		{
+			this->keyFrameIndex = 0;
+			this->TimeSpent = 0;
+		}
+
+		if (this->keyFrameIndex > nbrKeyFrames)
+			this->keyFrameIndex = 0;
+
+		this->drawStep3();
+	}
+
+	void drawStep3(void)
+	{
+		std::vector<Transform> bones;
+		std::vector<LibMath::Mat4> bonesMatrices;
+		int BoneCount = GetSkeletonBoneCount() - 7;
+		bones.reserve(BoneCount);
+		bonesMatrices.reserve(BoneCount);
+
+		Transform animBone;
+
+		for (int i = 0; i < BoneCount; i++)
+		{
+			bones.push_back(Transform());
+			GetSkeletonBoneLocalBindTransform(i, bones[i].mPosition.x, bones[i].mPosition.y, bones[i].mPosition.z,
+				bones[i].mRotation.w, bones[i].mRotation.x, bones[i].mRotation.y, bones[i].mRotation.z);
+
+			GetAnimLocalBoneTransform("ThirdPersonWalk.anim", i, this->keyFrameIndex, animBone.mPosition.x, animBone.mPosition.y, animBone.mPosition.z,
+				animBone.mRotation.w, animBone.mRotation.x, animBone.mRotation.y, animBone.mRotation.z);
+
+			int parent = GetSkeletonBoneParentIndex(i);
+
+			if (parent != -1)
+				bones[i] = (animBone * bones[i]) * bones[parent];  /*<---WORLD MATRIX*/
+
+			//if (parent != -1)
+			//	bones[i] *= bones[parent];
+
+			LibMath::Mat4 offsetMatrix = LibMath::Mat4(bones[i]) * this->inverseBindMatrices[i];
+			bonesMatrices.push_back(offsetMatrix);
+		}
+
+		SetSkinningPose((float*)&bonesMatrices[0][0], BoneCount);
+	}
 
 	virtual void Update(float frameTime) override
 	{
@@ -109,7 +180,8 @@ class CSimulation : public ISimulation
 		DrawLine(0, 0, 0, 0, 0, 100, 0, 0, 1);
 
 		//this->step1();
-		this->step2(frameTime);
+		//this->step2(frameTime);
+		this->step3(frameTime);
 	}
 
 public: 
@@ -126,6 +198,7 @@ public:
 		printf("\n");
 	}
 
+	std::vector<LibMath::Mat4> inverseBindMatrices;
 	int keyFrameIndex = 0;
 	float TimeSpent = 0;
 };

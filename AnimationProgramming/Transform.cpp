@@ -10,6 +10,8 @@ Transform::operator LibMath::Mat4() const
 	return result;
 }
 
+
+
 Transform operator*(Transform pLeft, Transform const& pRight)
 {
 	pLeft.mPosition = LibMath::Quat::Rotate(pRight.mRotation, { pLeft.mPosition.x, pLeft.mPosition.y, pLeft.mPosition.z , 0 });

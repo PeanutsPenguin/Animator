@@ -61,22 +61,32 @@ namespace LibMath
 			Vector4(quat.c, quat.d, quat.a, -quat.b), Vector4(quat.d, -quat.c, quat.b, quat.a));
 	}
 
-	Mat4 Quat::Rotation(Quat quat)
+	LibMath::Mat4 Quat::Rotation(Quat quat)
 	{
 		if (!Quat::IsUnit(quat))
 		{
 			quat = Quat::Normalize(quat);
 		}
 
-		return Mat4(
-			Vector4(quat.a * quat.a + quat.b * quat.b - quat.c * quat.c - quat.d * quat.d,
-							 2.f * quat.b * quat.c - 2.f * quat.a * quat.d, 2.f * quat.a * quat.c + 2.f * quat.b * quat.d, 0.f),
-			Vector4(2.f * quat.a * quat.d + 2.f * quat.b * quat.c,
-							 quat.a * quat.a - quat.b * quat.b + quat.c * quat.c - quat.d * quat.d,
-							 2.f * quat.c * quat.d - 2.f * quat.a * quat.b, 0.f),
-			Vector4(2.f * quat.b * quat.d - 2.f * quat.a * quat.c, 2.f * quat.a * quat.b + 2.f * quat.c * quat.b,
-							 quat.a * quat.a - quat.b * quat.b - quat.c * quat.c + quat.d * quat.d, 0.f),
-			Vector4::Zero());
+		float const aSquared = quat.a * quat.a;
+		float const bSquared = quat.b * quat.b;
+		float const cSquared = quat.c * quat.c;
+		float const dSquared = quat.d * quat.d;
+
+		float const ab = quat.a * quat.b;
+		float const ac = quat.a * quat.c;
+		float const ad = quat.a * quat.d;
+
+		float const bc = quat.b * quat.c;
+		float const bd = quat.b * quat.d;
+
+		float const cd = quat.c * quat.d;
+
+		return LibMath::Mat4(
+			LibMath::Vector4(aSquared + bSquared - cSquared - dSquared, 2.f * (ad + bc), 2.f * (bd - ac), 0.f),
+			LibMath::Vector4(2.f * (bc - ad), aSquared - bSquared + cSquared - dSquared, 2.f * (ab + cd), 0.f),
+			LibMath::Vector4(2.f * (ac + bd), 2.f * (cd - ab), aSquared - bSquared - cSquared + dSquared, 0.f),
+			LibMath::Vector4::Zero());
 	}
 
 	Vector3 Quat::Rotate(Quat const& quat,Vector3 const& vec)
