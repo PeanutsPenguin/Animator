@@ -1,6 +1,7 @@
 #include <LibMath/quat.h>
 
 #include "LibMath/Arithmetic.h"
+#include "LibMath/Interpolation.h"
 
 namespace LibMath
 {
@@ -11,6 +12,34 @@ namespace LibMath
 	Quat::Quat(float a,Vector3 const& im) : a(a), b(im.x), c(im.y), d(im.z) {}
 
 	Quat::Quat(float a, float b, float c, float d) : a(a), b(b), c(c), d(d) {}
+
+	Quat::operator LibMath::Vector<4U, float>() const 
+	{
+		LibMath::Vector4 result(this->a, this->b, this->c, this->d);
+
+		return result;
+	}
+
+	Quat Quat::Slerp(Quat const& a, Quat b, float alpha)
+	{
+		float RawCosom = LibMath::Vector4::Dot(a, b);
+
+		float const Sign = RawCosom >= 0.f ? 1.f : -1.f;
+		RawCosom *= Sign;
+
+		float Scale0 = 1.f - alpha;
+		float Scale1 = alpha * Sign;
+
+		if (RawCosom < 1.f)
+		{
+			float const Omega = std::acos(RawCosom);
+			float const InvSin = 1.f / std::sin(Omega);
+			Scale0 = std::sin(Scale0 * Omega) * InvSin;
+			Scale1 = std::sin(Scale1 * Omega) * InvSin;
+		}
+
+		return a * Scale0 + b * Scale1;
+	}
 
 	float Quat::Magnitude(Quat const& quat)
 	{
@@ -101,7 +130,7 @@ namespace LibMath
 		return Vector4(result.b, result.c, result.d, result.a);
 	}
 
-	Quat operator+(Quat& lhs, Quat const& rhs)
+	Quat operator+(Quat const& lhs, Quat const& rhs)
 	{
 		Vector4 const lhsIm  = Vector4(lhs.b, lhs.c, lhs.d, lhs.a);
 		Vector4 const rhsIm  = Vector4(rhs.b, rhs.c, rhs.d, rhs.a);
@@ -197,6 +226,11 @@ namespace LibMath
 	Vector4 operator*(Quat const& quat, Vector4 const& vec)
 	{
 		return Quat::Rotate(quat, vec);
+	}
+
+	bool operator==(Quat const& lhs, Quat const& rhs)
+	{
+		return (lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z && lhs.w == rhs.w);
 	}
 
 	std::ostream& operator<<(std::ostream& os, Quat const& quat)

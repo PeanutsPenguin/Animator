@@ -141,7 +141,7 @@ namespace LibMath
 
 		Vector<4, _Type>	operator/(_Type) const;								//Operator / to divide by a constant
 
-	
+		
 
 
 

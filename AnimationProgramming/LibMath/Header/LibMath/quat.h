@@ -26,6 +26,10 @@ namespace LibMath
 
 		Quat(float a, float b, float c, float d);
 
+		operator Vector4() const;
+
+		static Quat Slerp(Quat const& a, Quat b, float alpha);
+
 		static float Magnitude(Quat const& quat);
 
 		static float MagnitudeSquared(Quat const& quat);
@@ -97,6 +101,8 @@ namespace LibMath
 	Vector3 operator*(Quat const& quat, Vector3 const& vec);
 
 	Vector4 operator*(Quat const& quat, Vector4 const& vec);
+
+	bool operator==(Quat const& rhs, Quat const& lhs);
 
 	std::ostream& operator<<(std::ostream& os, Quat const& quat);
 } // namespace LibMath

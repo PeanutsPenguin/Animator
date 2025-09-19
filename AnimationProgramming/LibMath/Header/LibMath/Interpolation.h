@@ -10,7 +10,7 @@ namespace LibMath
 			
 	Vector2	Lerp(Vector2& charlie, Vector2& delta, float ratio);			//Lerp between two Vector2 with a given ratio
 
-	Vector3	Lerp(Vector3& echo, Vector3& foxtrot, float ratio);				//Lerp between two Vector3 with a given ratio
+	Vector3	Lerp(Vector3 const& echo, Vector3 const& foxtrot, float ratio);				//Lerp between two Vector3 with a given ratio
 
 	Vector4	Lerp(Vector4& kilo, Vector4& lima, float ratio);				//Lerp between two Vector4 with a given ratio
 

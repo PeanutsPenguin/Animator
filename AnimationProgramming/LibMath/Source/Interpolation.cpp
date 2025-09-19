@@ -23,7 +23,7 @@ namespace LibMath
 		return (delta - charlie) * ratio + charlie;
 	}
 
-	Vector3 Lerp(Vector3& echo, Vector3& foxtrot, float ratio)
+	Vector3 Lerp(Vector3 const& echo, Vector3 const& foxtrot, float ratio)
 	{
 		if (ratio == 0)
 			return echo;
