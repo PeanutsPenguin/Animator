@@ -1,0 +1,21 @@
+﻿  AnimationHandler.cpp
+  AnimationProgramming.cpp
+C:\Personnal Project\Animator\AnimationProgramming\AnimationProgramming.cpp(36,23): warning C4018: '<': signed/unsigned mismatch
+C:\Personnal Project\Animator\AnimationProgramming\AnimationProgramming.cpp(64,24): warning C4018: '<': signed/unsigned mismatch
+C:\Personnal Project\Animator\AnimationProgramming\AnimationProgramming.cpp(69,25): warning C4018: '<': signed/unsigned mismatch
+C:\Personnal Project\Animator\AnimationProgramming\AnimationProgramming.cpp(106,24): warning C4018: '<': signed/unsigned mismatch
+  Angle.cpp
+  Arithmetic.cpp
+  Collision2D.cpp
+C:\Personnal Project\Animator\AnimationProgramming\LibMath\Source\Collision\Collision2D.cpp(181,22): warning C4018: '<': signed/unsigned mismatch
+C:\Personnal Project\Animator\AnimationProgramming\LibMath\Source\Collision\Collision2D.cpp(188,22): warning C4018: '<': signed/unsigned mismatch
+  Collision3D.cpp
+  Interpolation.cpp
+  quat.cpp
+  Trigonometry.cpp
+  stdafx.cpp
+  Transform.cpp
+  Generating Code...
+  AnimationProgramming.vcxproj -> C:\Personnal Project\Animator\Debug\AnimationProgramming.exe
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.
